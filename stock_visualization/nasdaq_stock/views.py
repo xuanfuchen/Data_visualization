@@ -2,9 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 # Create your views here.
-def hello(request):
-    return render(request, 'html/test.html')
+def main(request):
+    return render(request, 'contents/main.html')
 
-def macro(request):
+def macroMap(request):
     data = []
-    return render(request, 'html/test.html')
+    return render(request, 'contents/maps.html')

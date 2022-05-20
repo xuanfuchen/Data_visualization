@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <!-- import echarts, echarts.map, jquery and custom echart themes -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.js.map"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="{% static 'js/theme/dark_theme.js' %}"></script>
+  </head>
+  <!-- <body style="background-color: #FFFFFF"> -->
+  <body>
+    <div id="world_map_count" style="width: auto;height:600px;"></div>
+    <div id="world_map_sales" style="width: 600px;height:400px;"></div>
+
+    <script>  //world map with stock count in each country
+      var chartDom = document.getElementById('world_map_count');
+      var myChart = echarts.init(chartDom, "better_dark");
+      var option;
+      var MIN_VAL = 1;
+      var MAX_VAL = 3000;
+
+      myChart.showLoading();
+      $.get("https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples/data/asset/geo/world.json", function (worldJson) {
+        myChart.hideLoading();
+        echarts.registerMap('world', worldJson, {});
+        option = {
+          title: {
+            text: 'Company locations',
+            subtext: 'Data from www.wsj.com',
+            sublink: 'https://www.wsj.com/market-data/quotes/company-list',
+            left: 'right'
+          },
+          tooltip: {
+            trigger: 'item',
+            showDelay: 0,
+            transitionDuration: 0.2
+          },
+          visualMap: {
+            left: 'right',
+            min: 500000,
+            max: 38000000,
+            inRange: {
+              color: [
+                '#313695',
+                '#4575b4',
+                '#74add1',
+                '#abd9e9',
+                '#e0f3f8',
+                '#ffffbf',
+                '#fee090',
+                '#fdae61',
+                '#f46d43',
+                '#d73027',
+                '#a50026'
+              ]
+            },
+            text: ['High', 'Low'],
+            calculable: true
+          },
+          toolbox: {
+            show: true,
+            //orient: 'vertical',
+            left: 'left',
+            top: 'top',
+            feature: {
+              dataView: { readOnly: false },
+              restore: {},
+              saveAsImage: {}
+            }
+          },
+          series: [
+            {
+              name: 'world map',
+              type: 'map',
+              roam: true,
+              map: 'world',
+              emphasis: {
+                label: {
+                  show: true
+                }
+              },
+              data: [
+                { name: 'China', value: 4822023 },
+                { name: 'United States', value: 731449 },
+                { name: 'Arizona', value: 6553255 },
+                { name: 'Arkansas', value: 2949131 },
+                { name: 'California', value: 38041430 },
+                { name: 'Colorado', value: 5187582 },
+                { name: 'Connecticut', value: 3590347 },
+                { name: 'Delaware', value: 917092 },
+                { name: 'District of Columbia', value: 632323 },
+                { name: 'Florida', value: 19317568 },
+                { name: 'Georgia', value: 9919945 },
+                { name: 'Hawaii', value: 1392313 },
+                { name: 'Idaho', value: 1595728 },
+              ]
+            }
+          ]
+        };
+        myChart.setOption(option);
+      });
+
+    </script>
+  </body>
+</html>

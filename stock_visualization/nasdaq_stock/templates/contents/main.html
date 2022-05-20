@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+<!-- title defined in base.html -->
+{% block title %}
+    Main Page
+{% endblock title %}
+
+<!-- contents -->
+{% block content %}
+
+<!-- div for top 5 stock chart-->
+<div id = "row_1" class="container">
+    <div class="row mt-2">
+        <div class="col-4 mb-4">
+            <div id="top_5_bar" style="width: 400px;height:400px;">
+            </div>
+        </div>
+        <div class="col-4 mb-4">
+            <div id="top_5_bar2" style="width:400px;height:400px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var divTopFiveBar = echarts.init(document.getElementById('top_5_bar'), 'better_dark');
+  // 基于准备好的dom，初始化echarts实例
+    var option = {
+    title: {
+      text: "test"
+    },
+    tooltip: {},
+    legend: {
+      data: ['销量']
+    },
+    xAxis: {
+      data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+    },
+    yAxis: {},
+    series: [
+      {
+        name: "销量",
+        type: 'bar',
+        data: [5, 20, 36, 10, 10, 20]
+      }
+    ]
+  };
+
+  // 使用刚指定的配置项和数据显示图表。
+  divTopFiveBar.setOption(option);
+</script>
+
+<script type="text/javascript">
+    var divTopFiveBar2 = echarts.init(document.getElementById('top_5_bar2'), 'better_dark');
+  // 基于准备好的dom，初始化echarts实例
+    var option = {
+    title: {
+      text: "test"
+    },
+    tooltip: {},
+    legend: {
+      data: ['销量']
+    },
+    xAxis: {
+      data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+    },
+    yAxis: {},
+    series: [
+      {
+        name: "销量",
+        type: 'bar',
+        data: [5, 20, 36, 10, 10, 20]
+      }
+    ]
+  };
+
+  // 使用刚指定的配置项和数据显示图表。
+  divTopFiveBar2.setOption(option);
+</script>
+
+{% endblock content %}
