@@ -1,5 +1,5 @@
 body {
-    background-color: #808080;
+    background-color: #FFFFFF;
 }
 
 div #top_ten_bar {
@@ -11,6 +11,12 @@ div #top_ten_bar {
 
 div #top_ten_line {
     display: block;
+    width: 100%;
+    height: 400px;
+    margin: 10px;
+}
+
+div #sector_compare_pie{
     width: 100%;
     height: 400px;
     margin: 10px;

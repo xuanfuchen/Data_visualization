@@ -3,6 +3,6 @@ from nasdaq_stock import views
 
 urlpatterns = [
     path('main/', views.main),
-    path('maps/', views.macroMap)
-
+    path('maps/', views.macroMap),
+    path('company_list/', views.companyList)
 ]

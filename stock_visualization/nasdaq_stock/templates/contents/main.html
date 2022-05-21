@@ -2,27 +2,59 @@
 {% load static %}
 <!-- title defined in base.html -->
 {% block title %}
-    Main Page
+Data Visualization
 {% endblock title %}
 
 <!-- contents -->
 {% block content %}
-<!-- import my css -->
-<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<!-- css for the page (sometimes runserver is not response to the updates in static file for some reason) -->
+<style>
+    body {
+        background-color: #808080;
+    }
 
+    div #top_ten_bar {
+        display: block;
+        width: auto;
+        height: 400px;
+        margin: 10px;
+    }
+
+    div #top_ten_line {
+        display: block;
+        width: 100%;
+        height: 400px;
+        margin: 10px;
+    }
+
+    div #sector_compare_pie {
+        width: 100%;
+        height: 400px;
+        margin: 10px;
+    }
+</style>
+
+<!--------------------------------------------------- page --------------------------------------------------->
 <!-- div for top 5 stock chart-->
 <div class="row mt-2">
-    <div class="col-md-5" id = "top_ten_bar"></div>
+    <div class="col-md-5" id="top_ten_bar"></div>
 
     <div class="col-md-6" id="top_ten_line"></div>
 </div>
 
 <div class="row mt-2">
-    <div class="col-md-5" id = "sector_compare_pie"><p>this is the first one</p></div>
+    <div class="col-md-5" id="sector_compare_pie">
+
+    </div>
 
     <div class="col-md-6" id=""></div>
 </div>
 
+name = {{ name | safe }}
+
+<!--------------------------------------------------- charts --------------------------------------------------->
+
+<!----------------------------------------------- top ten bar chart -------------------------------------------->
 <script type="text/javascript">
     var chartDom = document.getElementById('top_ten_bar')
     var myChart = echarts.init(chartDom, 'better_dark');
@@ -30,121 +62,181 @@
     // get data from the backend
     var symbol = {{ symbol | safe }};
     var sales = {{ sales | safe }};
+    var compName = {{ compName | safe }};
 
     // resize not working for some reason
-    window.onresize = function() {
+    window.onresize = function () {
         myChart.resize();
     };
 
     // set options fo the chart
     var option = {
-    title: {
-      text: "test"
-    },
-    tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-            type: 'shadow'
-    }
-  },
-    legend: {
-        data: ["sales"]
-    },
-    grid: {
-        containLabel: true
-    },
-    xAxis: {
-        type: 'value',
-        boundaryGap: [0, 0.01]
-    },
-    yAxis: {
-        data: symbol.reverse(),
-        type: "category"
-    },
-    series: [
-      {
-        name: "sales",
-        type: 'bar',
-        data: sales.reverse()
-      },
-    ]
-  };
-  myChart.setOption(option);
+        title: {
+            text: "Top 10 companies by sales in 2021"
+        },
+        tooltip: {
+            show: true,
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            }
+        },
+        legend: {
+            data: [""]
+        },
+        grid: {
+        },
+        xAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: function (value, index) {
+                    var val = Math.abs(value)
+                    var oneBillion = 1000000000;
+                    if (val >= oneBillion) {
+                        val = (val / oneBillion).toFixed(0) + ' B'
+                    }
+                    return val;
+                }
+            },
+            boundaryGap: [0, 0.01]
+        },
+        yAxis: {
+            containLabel: true,
+            data: symbol.reverse(),
+            type: "category"
+        },
+        series: [
+            {
+                name: "sales",
+                type: 'bar',
+                data: sales.reverse()
+            },
+        ]
+    };
+    myChart.setOption(option);
 </script>
 
+
+<!----------------------------------------------- top ten line chart -------------------------------------------->
 <script type="text/javascript">
     var chartDom = document.getElementById('top_ten_line');
     var myChart = echarts.init(chartDom, 'better_dark');
     var option;
 
-    window.onresize = function() {
+    window.onresize = function () {
         myChart.resize();
     };
 
     option = {
-    title: {
-        text: 'Stacked Line'
-    },
-    tooltip: {
-        trigger: 'axis'
-    },
-    legend: {
-        data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
-    },
-    grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-    },
-    toolbox: {
-        feature: {
-        saveAsImage: {}
-        }
-    },
-    xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    },
-    yAxis: {
-        type: 'value'
-    },
-    series: [
-        {
-        name: 'Email',
-        type: 'line',
-        stack: 'Total',
-        data: [120, 132, 101, 134, 90, 230, 210]
+        title: {
+            text: 'Stacked Line'
         },
-        {
-        name: 'Union Ads',
-        type: 'line',
-        stack: 'Total',
-        data: [220, 182, 191, 234, 290, 330, 310]
+        tooltip: {
+            trigger: 'axis'
         },
-        {
-        name: 'Video Ads',
-        type: 'line',
-        stack: 'Total',
-        data: [150, 232, 201, 154, 190, 330, 410]
+        legend: {
+            data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
         },
-        {
-        name: 'Direct',
-        type: 'line',
-        stack: 'Total',
-        data: [320, 332, 301, 334, 390, 330, 320]
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
         },
-        {
-        name: 'Search Engine',
-        type: 'line',
-        stack: 'Total',
-        data: [820, 932, 901, 934, 1290, 1330, 1320]
-        }
-    ]
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                name: 'Email',
+                type: 'line',
+                stack: 'Total',
+                data: [120, 132, 101, 134, 90, 230, 210]
+            },
+            {
+                name: 'Union Ads',
+                type: 'line',
+                stack: 'Total',
+                data: [220, 182, 191, 234, 290, 330, 310]
+            },
+            {
+                name: 'Video Ads',
+                type: 'line',
+                stack: 'Total',
+                data: [150, 232, 201, 154, 190, 330, 410]
+            },
+            {
+                name: 'Direct',
+                type: 'line',
+                stack: 'Total',
+                data: [320, 332, 301, 334, 390, 330, 320]
+            },
+            {
+                name: 'Search Engine',
+                type: 'line',
+                stack: 'Total',
+                data: [820, 932, 901, 934, 1290, 1330, 1320]
+            }
+        ]
     };
 
     myChart.setOption(option);
 </script>
+
+<!------------------------------------------------ sector pie chart --------------------------------------------->
+<script type="text/javascript">
+    var chartDom = document.getElementById('sector_compare_pie');
+    var myChart = echarts.init(chartDom, 'better_dark');
+    var option;
+
+    option = {
+        title: {
+            text: 'Referer of a Website',
+            subtext: 'Fake Data',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left'
+        },
+        series: [
+            {
+                name: 'Access From',
+                type: 'pie',
+                radius: '50%',
+                data: [
+                    { value: 1048, name: 'Search Engine' },
+                    { value: 735, name: 'Direct' },
+                    { value: 580, name: 'Email' },
+                    { value: 484, name: 'Union Ads' },
+                    { value: 300, name: 'Video Ads' }
+                ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+
+    option && myChart.setOption(option);
+</script>
+
 
 {% endblock content %}
