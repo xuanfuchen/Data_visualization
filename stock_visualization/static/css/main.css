@@ -1,0 +1,17 @@
+body {
+    background-color: #808080;
+}
+
+div #top_ten_bar {
+    display: block;
+    width: auto;
+    height: 400px;
+    margin: 10px;
+}
+
+div #top_ten_line {
+    display: block;
+    width: 100%;
+    height: 400px;
+    margin: 10px;
+}

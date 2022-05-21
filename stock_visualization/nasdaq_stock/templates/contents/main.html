@@ -7,75 +7,144 @@
 
 <!-- contents -->
 {% block content %}
+<!-- import my css -->
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
 
 <!-- div for top 5 stock chart-->
-<div id = "row_1" class="container">
-    <div class="row mt-2">
-        <div class="col-4 mb-4">
-            <div id="top_5_bar" style="width: 400px;height:400px;">
-            </div>
-        </div>
-        <div class="col-4 mb-4">
-            <div id="top_5_bar2" style="width:400px;height:400px;">
-            </div>
-        </div>
-    </div>
+<div class="row mt-2">
+    <div class="col-md-5" id = "top_ten_bar"></div>
+
+    <div class="col-md-6" id="top_ten_line"></div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-md-5" id = "sector_compare_pie"><p>this is the first one</p></div>
+
+    <div class="col-md-6" id=""></div>
 </div>
 
 <script type="text/javascript">
-    var divTopFiveBar = echarts.init(document.getElementById('top_5_bar'), 'better_dark');
-  // 基于准备好的dom，初始化echarts实例
+    var chartDom = document.getElementById('top_ten_bar')
+    var myChart = echarts.init(chartDom, 'better_dark');
+
+    // get data from the backend
+    var symbol = {{ symbol | safe }};
+    var sales = {{ sales | safe }};
+
+    // resize not working for some reason
+    window.onresize = function() {
+        myChart.resize();
+    };
+
+    // set options fo the chart
     var option = {
     title: {
       text: "test"
     },
-    tooltip: {},
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'shadow'
+    }
+  },
     legend: {
-      data: ['销量']
+        data: ["sales"]
+    },
+    grid: {
+        containLabel: true
     },
     xAxis: {
-      data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+        type: 'value',
+        boundaryGap: [0, 0.01]
     },
-    yAxis: {},
+    yAxis: {
+        data: symbol.reverse(),
+        type: "category"
+    },
     series: [
       {
-        name: "销量",
+        name: "sales",
         type: 'bar',
-        data: [5, 20, 36, 10, 10, 20]
-      }
+        data: sales.reverse()
+      },
     ]
   };
-
-  // 使用刚指定的配置项和数据显示图表。
-  divTopFiveBar.setOption(option);
+  myChart.setOption(option);
 </script>
 
 <script type="text/javascript">
-    var divTopFiveBar2 = echarts.init(document.getElementById('top_5_bar2'), 'better_dark');
-  // 基于准备好的dom，初始化echarts实例
-    var option = {
+    var chartDom = document.getElementById('top_ten_line');
+    var myChart = echarts.init(chartDom, 'better_dark');
+    var option;
+
+    window.onresize = function() {
+        myChart.resize();
+    };
+
+    option = {
     title: {
-      text: "test"
+        text: 'Stacked Line'
     },
-    tooltip: {},
+    tooltip: {
+        trigger: 'axis'
+    },
     legend: {
-      data: ['销量']
+        data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    toolbox: {
+        feature: {
+        saveAsImage: {}
+        }
     },
     xAxis: {
-      data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+        type: 'category',
+        boundaryGap: false,
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     },
-    yAxis: {},
+    yAxis: {
+        type: 'value'
+    },
     series: [
-      {
-        name: "销量",
-        type: 'bar',
-        data: [5, 20, 36, 10, 10, 20]
-      }
+        {
+        name: 'Email',
+        type: 'line',
+        stack: 'Total',
+        data: [120, 132, 101, 134, 90, 230, 210]
+        },
+        {
+        name: 'Union Ads',
+        type: 'line',
+        stack: 'Total',
+        data: [220, 182, 191, 234, 290, 330, 310]
+        },
+        {
+        name: 'Video Ads',
+        type: 'line',
+        stack: 'Total',
+        data: [150, 232, 201, 154, 190, 330, 410]
+        },
+        {
+        name: 'Direct',
+        type: 'line',
+        stack: 'Total',
+        data: [320, 332, 301, 334, 390, 330, 320]
+        },
+        {
+        name: 'Search Engine',
+        type: 'line',
+        stack: 'Total',
+        data: [820, 932, 901, 934, 1290, 1330, 1320]
+        }
     ]
-  };
+    };
 
-  // 使用刚指定的配置项和数据显示图表。
-  divTopFiveBar2.setOption(option);
+    myChart.setOption(option);
 </script>
 
 {% endblock content %}
