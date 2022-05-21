@@ -50,7 +50,7 @@ Data Visualization
     <div class="col-md-6" id=""></div>
 </div>
 
-name = {{ name | safe }}
+industry_total_list = {{ industry_total_list | safe }}
 
 <!--------------------------------------------------- charts --------------------------------------------------->
 
@@ -72,14 +72,14 @@ name = {{ name | safe }}
     // set options fo the chart
     var option = {
         title: {
-            text: "Top 10 companies by sales in 2021"
+            text: "Top 10 Companies by Sales in 2021"
         },
         tooltip: {
             show: true,
             trigger: 'axis',
             axisPointer: {
                 type: 'shadow'
-            }
+            },
         },
         legend: {
             data: [""]
@@ -93,7 +93,7 @@ name = {{ name | safe }}
                     var val = Math.abs(value)
                     var oneBillion = 1000000000;
                     if (val >= oneBillion) {
-                        val = (val / oneBillion).toFixed(0) + ' B'
+                        val = '$ ' + (val / oneBillion).toFixed(0) + 'B'
                     }
                     return val;
                 }
@@ -199,31 +199,26 @@ name = {{ name | safe }}
     var myChart = echarts.init(chartDom, 'better_dark');
     var option;
 
+    var sector_total_list = {{ sector_total_list | safe }}
+
     option = {
         title: {
-            text: 'Referer of a Website',
-            subtext: 'Fake Data',
+            text: 'Top 10 Sectors by Total Sales',
             left: 'center'
         },
         tooltip: {
             trigger: 'item'
         },
         legend: {
-            orient: 'vertical',
-            left: 'left'
+            orient: 'horizontal',
+            bottom: '0px',
         },
         series: [
             {
                 name: 'Access From',
                 type: 'pie',
                 radius: '50%',
-                data: [
-                    { value: 1048, name: 'Search Engine' },
-                    { value: 735, name: 'Direct' },
-                    { value: 580, name: 'Email' },
-                    { value: 484, name: 'Union Ads' },
-                    { value: 300, name: 'Video Ads' }
-                ],
+                data: sector_total_list,
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
