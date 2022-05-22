@@ -88,6 +88,7 @@ industry_total_list = {{ industry_total_list | safe }}
         },
         xAxis: {
             type: 'value',
+            
             axisLabel: {
                 formatter: function (value, index) {
                     var val = Math.abs(value)
@@ -103,7 +104,9 @@ industry_total_list = {{ industry_total_list | safe }}
         yAxis: {
             containLabel: true,
             data: symbol.reverse(),
-            type: "category"
+            type: "category",
+            axisLabel: {
+            }
         },
         series: [
             {

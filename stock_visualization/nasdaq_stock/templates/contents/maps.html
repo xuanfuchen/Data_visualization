@@ -7,30 +7,99 @@ Data Visualization
 
 <!-- contents -->
 {% block content %}
+<!-- CDN import bootstrap4 toggle  -->
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
 <!-- css for the page (sometimes runserver is not response to the updates in static file for some reason) -->
 <style>
   body {
     background-color: #808080;
   }
 
-  div .container-fluid{
-    border: solid;
+  #count_map_text {
+    text-align: center;
+    vertical-align: middle;
+    padding: 5px;
+    margin-top: 5px;
+    margin-left: 40px;
     background-color: white;
   }
 
-  div #world_map_count {
-    border: solid;
-    width: 1200px;
-    height: 600px;
-    margin:20px;
+  #count_map_switch{
+    margin-top: 5px;
+    background-color: white;
   }
+
+  #sales_map_text {
+    text-align: center;
+    vertical-align: middle;
+    padding: 5px;
+    margin-top: 5px;
+    margin-left: 40px;
+    background-color: white;
+  }
+
+  #sales_map_switch{
+    margin-top: 5px;
+    background-color: white;
+  }
+
+  .col-auto{
+    text-align: center;
+    padding: 5px;
+  }
+
+  #world_map_count {
+    width: 1300px;
+    height: 600px;
+    padding-top: 5px;
+    margin-left: 40px;
+    margin-top: -5px;
+    background-color: white;
+  }
+
+
+  #world_map_sales {
+    width: 1300px;
+    height: 600px;
+    padding-top: 5px;
+    margin-left: 40px;
+    margin-top: -5px;
+    background-color: white;
+  }
+  /* for bootstrap toggle */
+  .toggle_1  .toggle-group { transition: left 0.2s; -webkit-transition: left 0.2s; }
 </style>
 
 <!--------------------------------------------------- page --------------------------------------------------->
-<div class="container-fluid">
-  <div class="container-fluid" id="world_map_count"></div>
+<div class="container-fluid" id = "first_map">
+  <div class="row">
+    <div class="col-auto text-center rounded-left d-inline-flex p-2" id="count_map_text">
+      <h4>Company Distribution on World Map by Numbers</h4>
+    </div>
+    <div class="col-auto rounded-right" id="count_map_switch">
+      <input type="checkbox" checked data-toggle="toggle" data-on="Switch to Bar Chart" data-off="Switch to World Map" data-onstyle="success" data-offstyle="primary" data-style="toggle_1">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-auto rounded" id="world_map_count"></div>
+  </div>
 </div>
-<div class="row mt-2" id="world_map_sales" style="width: 600px;height:400px;"></div>
+
+<div class="container-fluid" id = "second_map">
+  <div class="row">
+    <div class="col-auto text-center rounded-left d-inline-flex p-2" id="sales_map_text">
+      <h4>Total sales in Each Country</h4>
+    </div>
+    <div class="col-auto rounded-right" id="sales_map_switch">
+      <input type="checkbox" checked data-toggle="toggle" data-on="Switch to Bar Chart" data-off="Switch to World Map" data-onstyle="success" data-offstyle="primary" data-style="toggle_1">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-auto rounded" id="world_map_sales"></div>
+  </div>
+</div>
 
 
 <!--------------------------------------------------- charts --------------------------------------------------->
@@ -38,22 +107,20 @@ Data Visualization
   var ROOT_PATH = 'https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
 
   var chartDom = document.getElementById('world_map_count');
-  var myChart = echarts.init(chartDom, 'better_dark');
+  var chart1 = echarts.init(chartDom, 'better_dark');
   var option;
 
-  var MAX_VAL = 3000;
+  var MAX_VAL = 4500;
   var MIN_VAL = 1;
 
-  myChart.showLoading();
-  $.get(ROOT_PATH + '/data/asset/geo/world.json', function (worldJson) {
-    myChart.hideLoading();
-    echarts.registerMap('world', worldJson, {
+  var count_list = {{ count_list | safe}};
+
+  chart1.showLoading();
+  $.get("{% static 'json/world.json' %}", function (worldJson) {
+    chart1.hideLoading();
+    echarts.registerMap('world_count', worldJson, {
     });
-    var data = [
-      { name: 'China', value: 4822023 },
-      { name: 'United States', value: 731449 },
-      { name: 'Canada', value: 6553255 },
-    ];
+    var data = count_list;
     data.sort(function (a, b) {
       return a.value - b.value;
     });
@@ -66,6 +133,9 @@ Data Visualization
           // prettier-ignore
           color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
         },
+        textStyle: {
+          color: "rgba(255, 255, 255, 255)"
+        },
         text: ['High', 'Low'],
         calculable: true
       },
@@ -74,7 +144,7 @@ Data Visualization
           id: 'count',
           type: 'map',
           roam: true,
-          map: 'world',
+          map: 'world_count',
           animationDurationUpdate: 1000,
           universalTransition: true,
           data: data
@@ -82,13 +152,23 @@ Data Visualization
       ]
     };
     const barOption = {
+      grid: {
+        containLabel: true
+      },
+      tooltip: {
+        show: true,
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+      },
       xAxis: {
         type: 'value'
       },
       yAxis: {
         type: 'category',
         axisLabel: {
-          rotate: 30
+          interval: 0,
         },
         data: data.map(function (item) {
           return item.name;
@@ -105,8 +185,99 @@ Data Visualization
       }
     };
     let currentOption = mapOption;
+    chart1.setOption(mapOption);
+    $("#count_map_switch").click(function () {
+      currentOption = currentOption === mapOption ? barOption : mapOption;
+      chart1.setOption(currentOption, true);
+    });
+  });
+
+  option && chart1.setOption(option);
+
+</script>
+
+<!--------------------------------------------------- charts --------------------------------------------------->
+<script>  //world map with stock count in each country
+  var ROOT_PATH = 'https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
+
+  var chartDom = document.getElementById('world_map_sales');
+  var myChart = echarts.init(chartDom, 'better_dark');
+  var option;
+
+  var sales_list = {{ sales_list | safe}};
+
+  myChart.showLoading();
+  $.get("{% static 'json/world.json' %}", function (worldJson) {
+    myChart.hideLoading();
+    echarts.registerMap('world_sales', worldJson, {
+    });
+    var data = sales_list;
+    data.sort(function (a, b) {
+      return a.value - b.value;
+    });
+    const mapOption = {
+      visualMap: {
+        left: 'right',
+        min: 1000000,
+        max: 1000000000000,
+        inRange: {
+          // prettier-ignore
+          color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+        },
+        textStyle: {
+          color: "rgba(255, 255, 255, 255)"
+        },
+        text: ['High', 'Low'],
+        calculable: true
+      },
+      series: [
+        {
+          id: 'sales',
+          type: 'map',
+          roam: true,
+          map: 'world_sales',
+          animationDurationUpdate: 1000,
+          universalTransition: true,
+          data: data
+        }
+      ]
+    };
+    const barOption = {
+      grid: {
+        containLabel: true
+      },
+      tooltip: {
+        show: true,
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+      },
+      xAxis: {
+        type: 'value'
+      },
+      yAxis: {
+        type: 'category',
+        axisLabel: {
+          interval: 0,
+        },
+        data: data.map(function (item) {
+          return item.name;
+        })
+      },
+      animationDurationUpdate: 1000,
+      series: {
+        type: 'bar',
+        id: 'sales',
+        data: data.map(function (item) {
+          return item.value;
+        }),
+        universalTransition: true
+      }
+    };
+    let currentOption = mapOption;
     myChart.setOption(mapOption);
-    $("#world_map_count").click(function () {
+    $("#sales_map_switch").click(function () {
       currentOption = currentOption === mapOption ? barOption : mapOption;
       myChart.setOption(currentOption, true);
     });

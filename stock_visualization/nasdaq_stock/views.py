@@ -42,8 +42,38 @@ def main(request):
     }
     return render(request, 'contents/main.html', dbData)
 
+
 def macroMap(request):
-    return render(request, 'contents/maps.html')
+    count_dict = defaultdict(int)
+    sales_dict = defaultdict(int)
+    companies = CompanyInfo.objects.all()
+    count_list = []
+    sales_list = []
+    for company in companies:
+        if company.country == "-":
+            # count_dict["Unknown"] += 1
+            pass
+        else:
+            count_dict[company.country] += 1
+            sales_dict[company.country] += int(company.sales)
+
+    
+    sorted_count = sorted(count_dict.items(), key = lambda item: item[1], reverse=True)
+    for x in sorted_count:
+        dict = {'name': x[0], 'value': x[1]}
+        count_list.append(dict)
+    
+    sorted_sales = sorted(sales_dict.items(), key = lambda item: item[1], reverse=True)
+    for x in sorted_sales:
+        dict = {'name': x[0], 'value': x[1]}
+        sales_list.append(dict)
+
+    dbData = {
+        "count_list": count_list,
+        "sales_list": sales_list
+    }
+    return render(request, 'contents/maps.html', dbData)
+
 
 def companyList(request):
     return render(request, 'contents/companyList.html')
