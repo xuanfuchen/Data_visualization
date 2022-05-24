@@ -49,30 +49,30 @@ Data Visualization
 
     <div class="col-md-6" id=""></div>
 </div>
-
-industry_total_list = {{ industry_total_list | safe }}
-
 <!--------------------------------------------------- charts --------------------------------------------------->
 
 <!----------------------------------------------- top ten bar chart -------------------------------------------->
 <script type="text/javascript">
-    var chartDom = document.getElementById('top_ten_bar')
-    var myChart = echarts.init(chartDom, 'better_dark');
+    var barChartDom = document.getElementById('top_ten_bar')
+    var topBarChart = echarts.init(barChartDom, 'better_dark');
 
     // get data from the backend
-    var symbol = {{ symbol | safe }};
+    var comp_symbol = {{ comp_symbol | safe }};
     var sales = {{ sales | safe }};
     var compName = {{ compName | safe }};
 
     // resize not working for some reason
     window.onresize = function () {
-        myChart.resize();
+        topBarChart.resize();
     };
 
     // set options fo the chart
-    var option = {
+    var barChartOption = {
         title: {
-            text: "Top 10 Companies by Sales in 2021"
+            text: "Top 10 Companies by Sales in 2021",
+            textStyle: {
+                fontSize: "24"
+            }
         },
         tooltip: {
             show: true,
@@ -103,7 +103,7 @@ industry_total_list = {{ industry_total_list | safe }}
         },
         yAxis: {
             containLabel: true,
-            data: symbol.reverse(),
+            data: comp_symbol.reverse(),
             type: "category",
             axisLabel: {
             }
@@ -116,98 +116,101 @@ industry_total_list = {{ industry_total_list | safe }}
             },
         ]
     };
-    myChart.setOption(option);
+    topBarChart.setOption(barChartOption);
 </script>
 
 
 <!----------------------------------------------- top ten line chart -------------------------------------------->
 <script type="text/javascript">
-    var chartDom = document.getElementById('top_ten_line');
-    var myChart = echarts.init(chartDom, 'better_dark');
-    var option;
+    var lineChartDom = document.getElementById('top_ten_line');
+    var topLineChart = echarts.init(lineChartDom, 'better_dark');
+    var topLineOption;
 
-    window.onresize = function () {
-        myChart.resize();
-    };
+    var lineChartData = {{ lineChartData | safe}}
 
-    option = {
-        title: {
-            text: 'Stacked Line'
-        },
-        tooltip: {
-            trigger: 'axis'
-        },
-        legend: {
-            data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        toolbox: {
-            feature: {
-                saveAsImage: {}
+    setTimeout(function () {
+        topLineOption = {
+            title: {
+                text: "Top 10 Companies Stock Price",
+                textStyle: {
+                fontSize: "24"
             }
-        },
-        xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [
-            {
-                name: 'Email',
-                type: 'line',
-                stack: 'Total',
-                data: [120, 132, 101, 134, 90, 230, 210]
             },
-            {
-                name: 'Union Ads',
-                type: 'line',
-                stack: 'Total',
-                data: [220, 182, 191, 234, 290, 330, 310]
+            legend: {
+                bottom: "bottom"
             },
-            {
-                name: 'Video Ads',
-                type: 'line',
-                stack: 'Total',
-                data: [150, 232, 201, 154, 190, 330, 410]
+            tooltip: {
+                trigger: 'axis',
+                showContent: true
             },
-            {
-                name: 'Direct',
-                type: 'line',
-                stack: 'Total',
-                data: [320, 332, 301, 334, 390, 330, 320]
+            dataset: {
+                source: lineChartData
             },
-            {
-                name: 'Search Engine',
-                type: 'line',
-                stack: 'Total',
-                data: [820, 932, 901, 934, 1290, 1330, 1320]
-            }
-        ]
-    };
+            xAxis: { type: 'category' },
+            yAxis: { gridIndex: 0 },
+            series: [
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+            ]
+        };
+        topLineChart.setOption(topLineOption);
+    });
 
-    myChart.setOption(option);
+    topLineOption && topLineChart.setOption(topLineOption);
 </script>
 
 <!------------------------------------------------ sector pie chart --------------------------------------------->
 <script type="text/javascript">
-    var chartDom = document.getElementById('sector_compare_pie');
-    var myChart = echarts.init(chartDom, 'better_dark');
-    var option;
+    var sectorPieChartDom = document.getElementById('sector_compare_pie');
+    var sectorPieChart = echarts.init(sectorPieChartDom, 'better_dark');
+    var sectorPieOption;
 
     var sector_total_list = {{ sector_total_list | safe }}
 
-    option = {
+    sectorPieOption = {
         title: {
             text: 'Top 10 Sectors by Total Sales',
-            left: 'center'
+            textStyle: {
+                fontSize: "24"
+            }
         },
         tooltip: {
             trigger: 'item'
@@ -233,7 +236,7 @@ industry_total_list = {{ industry_total_list | safe }}
         ]
     };
 
-    option && myChart.setOption(option);
+    sectorPieOption && sectorPieChart.setOption(sectorPieOption);
 </script>
 
 

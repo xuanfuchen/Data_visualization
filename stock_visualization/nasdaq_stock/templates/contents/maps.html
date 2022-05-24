@@ -18,30 +18,34 @@ Data Visualization
   }
 
   #count_map_text {
-    text-align: center;
-    vertical-align: middle;
+    width: 1100px;
     padding: 5px;
     margin-top: 5px;
     margin-left: 40px;
+    margin-bottom: -5px;
     background-color: white;
   }
 
   #count_map_switch{
+    width: 200px;
     margin-top: 5px;
+    margin-bottom: -5px;
     background-color: white;
   }
 
   #sales_map_text {
-    text-align: center;
-    vertical-align: middle;
+    width: 1100px;
     padding: 5px;
     margin-top: 5px;
     margin-left: 40px;
+    margin-bottom: -5px;
     background-color: white;
   }
 
   #sales_map_switch{
+    width: 200px;
     margin-top: 5px;
+    margin-bottom: -5px;
     background-color: white;
   }
 
@@ -75,8 +79,8 @@ Data Visualization
 <!--------------------------------------------------- page --------------------------------------------------->
 <div class="container-fluid" id = "first_map">
   <div class="row">
-    <div class="col-auto text-center rounded-left d-inline-flex p-2" id="count_map_text">
-      <h4>Company Distribution on World Map by Numbers</h4>
+    <div class="col-auto justify-content-center align-items-center rounded-left d-inline-flex p-2" id="count_map_text">
+      <h4 id="count_map_text_h4">Company Distribution on World Map by Numbers</h4>
     </div>
     <div class="col-auto rounded-right" id="count_map_switch">
       <input type="checkbox" checked data-toggle="toggle" data-on="Switch to Bar Chart" data-off="Switch to World Map" data-onstyle="success" data-offstyle="primary" data-style="toggle_1">
@@ -89,8 +93,8 @@ Data Visualization
 
 <div class="container-fluid" id = "second_map">
   <div class="row">
-    <div class="col-auto text-center rounded-left d-inline-flex p-2" id="sales_map_text">
-      <h4>Total sales in Each Country</h4>
+    <div class="col-auto justify-content-center align-items-center rounded-left d-inline-flex p-2" id="sales_map_text">
+      <h4 id="sales_map_text_h4">Total sales in Each Country</h4>
     </div>
     <div class="col-auto rounded-right" id="sales_map_switch">
       <input type="checkbox" checked data-toggle="toggle" data-on="Switch to Bar Chart" data-off="Switch to World Map" data-onstyle="success" data-offstyle="primary" data-style="toggle_1">
@@ -106,18 +110,20 @@ Data Visualization
 <script>  //world map with stock count in each country
   var ROOT_PATH = 'https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
 
-  var chartDom = document.getElementById('world_map_count');
-  var chart1 = echarts.init(chartDom, 'better_dark');
-  var option;
+  var countMapDom = document.getElementById('world_map_count');
+  var countMap = echarts.init(countMapDom, 'better_dark');
+  var countMapOption;
 
-  var MAX_VAL = 4500;
-  var MIN_VAL = 1;
+  var MAX_VAL_COUNT = 4500;
+  var MIN_VAL_COUNT = 0;
 
-  var count_list = {{ count_list | safe}};
+  var count_list = {{ count_list | safe }};
+  var country_count = {{ country_count | safe }}
+  var comp_count = {{ comp_count | safe }}
 
-  chart1.showLoading();
+  countMap.showLoading();
   $.get("{% static 'json/world.json' %}", function (worldJson) {
-    chart1.hideLoading();
+    countMap.hideLoading();
     echarts.registerMap('world_count', worldJson, {
     });
     var data = count_list;
@@ -127,8 +133,8 @@ Data Visualization
     const mapOption = {
       visualMap: {
         left: 'right',
-        min: MIN_VAL,
-        max: MAX_VAL,
+        min: MIN_VAL_COUNT,
+        max: MAX_VAL_COUNT,
         inRange: {
           // prettier-ignore
           color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
@@ -170,29 +176,26 @@ Data Visualization
         axisLabel: {
           interval: 0,
         },
-        data: data.map(function (item) {
-          return item.name;
-        })
+        data: country_count.reverse(),
       },
       animationDurationUpdate: 1000,
       series: {
         type: 'bar',
         id: 'count',
-        data: data.map(function (item) {
-          return item.value;
-        }),
+        data: comp_count.reverse(),
         universalTransition: true
       }
     };
     let currentOption = mapOption;
-    chart1.setOption(mapOption);
+    countMap.setOption(mapOption);
     $("#count_map_switch").click(function () {
       currentOption = currentOption === mapOption ? barOption : mapOption;
-      chart1.setOption(currentOption, true);
+      currentOption === barOption ? document.getElementById("count_map_text_h4").innerHTML = "Top 20 Countries by Numbers of Companies" : document.getElementById("count_map_text_h4").innerHTML = "Company Distribution on World Map by Numbers";
+      countMap.setOption(currentOption, true);
     });
   });
 
-  option && chart1.setOption(option);
+  countMapOption && countMap.setOption(countMapOption);
 
 </script>
 
@@ -200,15 +203,20 @@ Data Visualization
 <script>  //world map with stock count in each country
   var ROOT_PATH = 'https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
 
-  var chartDom = document.getElementById('world_map_sales');
-  var myChart = echarts.init(chartDom, 'better_dark');
-  var option;
+  var salesMapDom = document.getElementById('world_map_sales');
+  var salesMap = echarts.init(salesMapDom, 'better_dark');
+  var salesMapOption;
 
   var sales_list = {{ sales_list | safe}};
+  var country_sales = {{ country_sales | safe }}
+  var comp_sales = {{ comp_sales | safe }}
 
-  myChart.showLoading();
+  var MAX_VAL = 1000000000000;
+  var MIN_VAL = 1000000;
+
+  salesMap.showLoading();
   $.get("{% static 'json/world.json' %}", function (worldJson) {
-    myChart.hideLoading();
+    salesMap.hideLoading();
     echarts.registerMap('world_sales', worldJson, {
     });
     var data = sales_list;
@@ -218,8 +226,8 @@ Data Visualization
     const mapOption = {
       visualMap: {
         left: 'right',
-        min: 1000000,
-        max: 1000000000000,
+        min: MIN_VAL,
+        max: MAX_VAL,
         inRange: {
           // prettier-ignore
           color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
@@ -261,29 +269,26 @@ Data Visualization
         axisLabel: {
           interval: 0,
         },
-        data: data.map(function (item) {
-          return item.name;
-        })
+        data: country_sales.reverse()
       },
       animationDurationUpdate: 1000,
       series: {
         type: 'bar',
         id: 'sales',
-        data: data.map(function (item) {
-          return item.value;
-        }),
+        data: comp_sales.reverse(),
         universalTransition: true
       }
     };
     let currentOption = mapOption;
-    myChart.setOption(mapOption);
+    salesMap.setOption(mapOption);
     $("#sales_map_switch").click(function () {
       currentOption = currentOption === mapOption ? barOption : mapOption;
-      myChart.setOption(currentOption, true);
+      currentOption === barOption ? document.getElementById("sales_map_text_h4").innerHTML = "Top 20 Countries by Total Sales" : document.getElementById("sales_map_text_h4").innerHTML = "Total sales in Each Country";
+      salesMap.setOption(currentOption, true);
     });
   });
 
-  option && myChart.setOption(option);
+  salesMapOption && salesMap.setOption(salesMapOption);
 
 </script>
 

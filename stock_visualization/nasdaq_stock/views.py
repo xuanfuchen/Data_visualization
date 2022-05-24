@@ -1,21 +1,23 @@
+from asyncio.windows_events import NULL
 from collections import defaultdict
+from copy import deepcopy
 from django.shortcuts import render
-from django.http import HttpResponse
-from nasdaq_stock.models import CompanyInfo
-import operator
+from nasdaq_stock.models import CompanyInfo, PriceHistory
 from django.db.models import IntegerField
 from django.db.models.functions import Cast
+from datetime import datetime
 
 # Create your views here.
 def main(request):
+    # ========================================================== data for bar chart and pie chart =============================================
     topCompanies = CompanyInfo.objects.annotate(int_sales = Cast('sales', IntegerField())).order_by('-int_sales')[:10]
-    compName = []
-    symbol = []
+    comp_Name = []
+    comp_symbol = []
     sales = []
     employees = []
     for company in topCompanies:
-        compName.append(company.company_name)
-        symbol.append(company.stock_symbol)
+        comp_Name.append(company.company_name)
+        comp_symbol.append(company.stock_symbol)
         sales.append(company.sales)
         employees.append(company.employees)
     
@@ -32,15 +34,65 @@ def main(request):
     for x in top_dict:
         dict = {'value': x[1], 'name': x[0]}
         sector_total_list.append(dict)
+    
 
+    # ========================================================== data for line chart ==========================================================
+    priceHistory = PriceHistory.objects.all()
+    # need a list [
+    # ['dates', date, date, date ... ...]
+    # ['comp_1', price, price, price ...]
+    # ['comp_2', price, price, price ...]
+    # ... ...
+    # ]
+    topCompaniesCpy = deepcopy(topCompanies)
+    # first get all dates that top 10 companies have record
+    dateList = []
+    for topCompany in topCompaniesCpy:
+        for datePrice in priceHistory:
+            if datePrice.stock_symbol == topCompany.stock_symbol:
+                if datePrice.price_date not in dateList:
+                    dateList.append(datePrice.price_date)
+    
+    dateList = sorted(dateList)
+    # create the first list in the return list
+    dates = ['dates']
+    for date in dateList:
+        dates.append(date.strftime("%b %d"))
+    
+    # create the list that will be sent to the front-end
+    lineChartData = []
+    lineChartData.append(dates)
+
+    for topCompany in topCompaniesCpy:
+        # iterate the top company list, topCompany belongs to CompanyInfo.objects
+        companyPriceList = []
+        companyPriceList.append(topCompany.stock_symbol)
+        symbol = topCompany.stock_symbol
+        # iterate through every possible date
+        for date in dateList:
+            # try to find corrispond price to the date, and add it to the list for that company
+            try:
+                datePrice = PriceHistory.objects.get(stock_symbol = symbol, price_date=date)
+                price = datePrice.close
+                companyPriceList.append(float(price))
+            # if the data doesn't exist, put a null there as a placeholder
+            except:
+                companyPriceList.append(NULL)
+        
+        # add the list to the return list
+        lineChartData.append(companyPriceList)
+
+    # ========================================================== sent data to the front-end ===================================================
     dbData = { 
-        "compName": compName,
-        "symbol": symbol,
+        "compName": comp_Name,
+        "comp_symbol": comp_symbol,
         "sales": sales, 
         "employees": employees,
         "sector_total_list": sector_total_list,
+        "lineChartData": lineChartData,
     }
     return render(request, 'contents/main.html', dbData)
+
 
 
 def macroMap(request):
@@ -49,6 +101,11 @@ def macroMap(request):
     companies = CompanyInfo.objects.all()
     count_list = []
     sales_list = []
+
+    country_count = []
+    comp_count = []
+    country_sales = []
+    comp_sales = []
     for company in companies:
         if company.country == "-":
             # count_dict["Unknown"] += 1
@@ -63,14 +120,26 @@ def macroMap(request):
         dict = {'name': x[0], 'value': x[1]}
         count_list.append(dict)
     
+    for x in sorted_count[:20]:
+        country_count.append(x[0])
+        comp_count.append(x[1])
+    
     sorted_sales = sorted(sales_dict.items(), key = lambda item: item[1], reverse=True)
     for x in sorted_sales:
         dict = {'name': x[0], 'value': x[1]}
         sales_list.append(dict)
 
+    for x in sorted_sales[:20]:
+        country_sales.append(x[0])
+        comp_sales.append(x[1])
+
     dbData = {
         "count_list": count_list,
-        "sales_list": sales_list
+        "sales_list": sales_list,
+        "country_count": country_count,
+        "comp_count": comp_count,
+        "country_sales": country_sales,
+        "comp_sales": comp_sales
     }
     return render(request, 'contents/maps.html', dbData)
 
