@@ -11,14 +11,14 @@ from datetime import datetime
 def main(request):
     # ========================================================== data for bar chart and pie chart =============================================
     topCompanies = CompanyInfo.objects.annotate(int_sales = Cast('sales', IntegerField())).order_by('-int_sales')[:10]
-    comp_Name = []
-    comp_symbol = []
-    sales = []
+    compNameList = []
+    symbolList = []
+    salesList = []
     employees = []
     for company in topCompanies:
-        comp_Name.append(company.company_name)
-        comp_symbol.append(company.stock_symbol)
-        sales.append(company.sales)
+        compNameList.append(company.company_name)
+        symbolList.append(company.stock_symbol)
+        salesList.append(company.sales)
         employees.append(company.employees)
     
     allComp = CompanyInfo.objects.all()
@@ -37,23 +37,24 @@ def main(request):
     
 
     # ========================================================== data for line chart ==========================================================
-    priceHistory = PriceHistory.objects.all()
     # need a list [
     # ['dates', date, date, date ... ...]
     # ['comp_1', price, price, price ...]
     # ['comp_2', price, price, price ...]
     # ... ...
     # ]
-    topCompaniesCpy = deepcopy(topCompanies)
+
+
     # first get all dates that top 10 companies have record
     dateList = []
-    for topCompany in topCompaniesCpy:
-        for datePrice in priceHistory:
-            if datePrice.stock_symbol == topCompany.stock_symbol:
-                if datePrice.price_date not in dateList:
-                    dateList.append(datePrice.price_date)
-    
+    for topCompany in topCompanies:
+        symbol = topCompany.stock_symbol
+        topPriceHistory = PriceHistory.objects.filter(stock_symbol = symbol)
+        for dayPrice in topPriceHistory:
+            if dayPrice.price_date not in dateList:
+                dateList.append(dayPrice.price_date)
     dateList = sorted(dateList)
+
     # create the first list in the return list
     dates = ['dates']
     for date in dateList:
@@ -63,11 +64,11 @@ def main(request):
     lineChartData = []
     lineChartData.append(dates)
 
-    for topCompany in topCompaniesCpy:
+    for topCompany in topCompanies:
         # iterate the top company list, topCompany belongs to CompanyInfo.objects
         companyPriceList = []
-        companyPriceList.append(topCompany.stock_symbol)
         symbol = topCompany.stock_symbol
+        companyPriceList.append(symbol)
         # iterate through every possible date
         for date in dateList:
             # try to find corrispond price to the date, and add it to the list for that company
@@ -84,9 +85,9 @@ def main(request):
 
     # ========================================================== sent data to the front-end ===================================================
     dbData = { 
-        "compName": comp_Name,
-        "comp_symbol": comp_symbol,
-        "sales": sales, 
+        "compName": compNameList,
+        "comp_symbol": symbolList,
+        "sales": salesList, 
         "employees": employees,
         "sector_total_list": sector_total_list,
         "lineChartData": lineChartData,
