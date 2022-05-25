@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+<!-- title defined in base.html -->
+{% block title %}
+Data Visualization
+{% endblock title %}
+
+<!-- contents -->
+{% block content %}
+<!-- css for the page (sometimes runserver is not response to the updates in static file for some reason) -->
+<style>
+body {
+    background-color: gray;
+}
+
+#title {
+    background-color: white;
+}
+
+#subtitle {
+    background-color: white;
+}
+</style>
+
+<!--------------------------------------------------- page --------------------------------------------------->
+<div class="container">
+    <div class="row">
+        <!-- company name and stock symbol -->
+        <div class="col-12 mt-4 mb-2 rounded" id = "title">
+            <h1>{{ companyDetail.company_name }} ( {{ companyDetail.stock_symbol }} )</h1>
+            <h4>Located in {{companyDetail.country}}</h4>
+        </div>
+        <div class="col-12 rounded" id = "subtitle">
+            <h5>Description:</h5>
+            <p>{{ companyDetail.description }}</p>
+        </div>
+        
+        <!-- company info charts -->
+    </div>
+    <div class="row align-items-center">
+        <div class = "col-4" id = "candleChart">
+
+        </div>
+        <div class = "col-4" id = "">
+
+        </div>
+    </div>
+</div>
+
+<!--------------------------------------------------- charts --------------------------------------------------->
+
+
+{% endblock content %}

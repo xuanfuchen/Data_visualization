@@ -146,4 +146,18 @@ def macroMap(request):
 
 
 def companyList(request):
-    return render(request, 'contents/companyList.html')
+    # get all company info from model CompanyInfo
+    companies = CompanyInfo.objects.all()
+
+    dbData = { 
+        "companies": companies,
+    }
+
+    return render(request, 'contents/companyList.html', dbData)
+
+def companyDetail(request, symbol):
+    companyDetail = CompanyInfo.objects.get(stock_symbol = symbol)
+    dbData = {
+        "companyDetail": companyDetail,
+    }
+    return render(request, 'contents/companyDetail.html', dbData)

@@ -2,14 +2,14 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
     <div class="navbar-header">
-        <a class="navbar-brand" href="http://127.0.0.1:8000/nasdaq/main/">Data Visualization</a>
+      <a class="navbar-brand" href="{% url 'main' %}">Data Visualization</a>
     </div>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link" href="http://127.0.0.1:8000/nasdaq/main/">Home <span class="sr-only">(current)</span></a>
-        <a class="nav-item nav-link" href="http://127.0.0.1:8000/nasdaq/maps/">Global Info</a>
-        <a class="nav-item nav-link" href="http://127.0.0.1:8000/nasdaq/company_list/">See All Compnaies</a>
+        <a class="nav-item nav-link" href="{% url 'main' %}">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="{% url 'maps' %}">Global Info</a>
+        <a class="nav-item nav-link" href="{% url 'companyList' %}">See All Companies</a>
       </div>
-
+    </div>
   </div>
 </nav>
