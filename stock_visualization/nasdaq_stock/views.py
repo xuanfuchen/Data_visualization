@@ -155,9 +155,35 @@ def companyList(request):
 
     return render(request, 'contents/companyList.html', dbData)
 
+
+
 def companyDetail(request, symbol):
     companyDetail = CompanyInfo.objects.get(stock_symbol = symbol)
+
+    companyPriceHistory = PriceHistory.objects.filter(stock_symbol = symbol)
+
+    categoryData = []
+    valueData = []
+    volumeData = []
+    scatterData = []
+
+    for companyPrice in companyPriceHistory:
+        # gather data for candlestick chart
+        categoryData.append(companyPrice.price_date.strftime("%b %d"))
+        valueList = [companyPrice.open, companyPrice.close, companyPrice.low, companyPrice.high]
+        valueData.append(valueList)
+        volumeData.append(companyPrice.volume)
+
+        # gather data for scatter chart
+        scatterList = [companyPrice.close, companyPrice.volume]
+        scatterData.append(scatterList)
+
     dbData = {
         "companyDetail": companyDetail,
+        "categoryData": categoryData,
+        "valueData": valueData,
+        "volumeData": volumeData,
+        "scatterData": scatterData
     }
+
     return render(request, 'contents/companyDetail.html', dbData)
