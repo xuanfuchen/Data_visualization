@@ -26,7 +26,7 @@ Data Visualization
         background-color: white;
     }
 
-    #scatterChart {
+    #lineChart {
         height: 550px;
         background-color: white;
     }
@@ -48,10 +48,10 @@ Data Visualization
         <!-- company info charts -->
     </div>
     <div class="row align-items-center">
-        <div class="col-md-12 rounded mt-2" id="candleChart">
+        <div class="col-md-12 rounded mt-2" id="lineChart">
 
         </div>
-        <div class="col-md-12 rounded mt-2" id="scatterChart">
+        <div class="col-md-12 rounded mt-2" id="candleChart">
 
         </div>
     </div>
@@ -176,7 +176,12 @@ Data Visualization
                     scale: true,
                     splitArea: {
                         show: true
-                    }
+                    },
+                    axisLabel: {
+                    formatter: function (value, index) {
+                    return '$ ' + value;
+                }
+            },
                 },
                 {
                     scale: true,
@@ -185,7 +190,25 @@ Data Visualization
                     axisLabel: { show: true },
                     axisLine: { show: true },
                     axisTick: { show: false },
-                    splitLine: { show: true }
+                    splitLine: { show: true },
+                    name: "Volume",
+                    nameLocation: "middle",
+                    nameGap: "35",
+                    nameRotate: 0,
+                    nameTextStyle: {
+                        fontWeight: "bolder",
+                        fontSize: "16",
+                    },
+                    axisLabel: {
+                    formatter: function (value, index) {
+                    var val = Math.abs(value)
+                    var oneMillion = 1000000;
+                    if (val >= oneMillion) {
+                        val = (val / oneMillion).toFixed(0) + ' M'
+                    }
+                    return val;
+                    }
+                }
                 }
             ],
             dataZoom: [
@@ -215,18 +238,6 @@ Data Visualization
                         borderColor: undefined,
                         borderColor0: undefined
                     },
-                    tooltip: {
-                        formatter: function (param) {
-                            param = param[0];
-                            return [
-                                'Date: ' + param.name + '<hr size=1 style="margin: 3px 0">',
-                                'Open: ' + param.data[0] + '<br/>',
-                                'Close: ' + param.data[1] + '<br/>',
-                                'Lowest: ' + param.data[2] + '<br/>',
-                                'Highest: ' + param.data[3] + '<br/>'
-                            ].join('');
-                        }
-                    }
                 },
                 {
                     name: 'Volume',
@@ -245,61 +256,61 @@ Data Visualization
 </script>
 
 
-
 <script>
-    var scatterChartDom = document.getElementById('scatterChart');
-    var scatterChart = echarts.init(scatterChartDom);
-    var scatterChartOption;
+    var lineAreatDom = document.getElementById('lineChart');
+    var lineAreaChart = echarts.init(lineAreatDom);
+    var lineAreaOption;
 
-    var scatterData = {{ scatterData| safe }};
+    var lineCategory = {{ lineCategory | safe }}
+    var lineValue = {{ lineValue| safe }};
 
-    scatterChartOption = {
-        title: {
-            text: 'Scatter of Volume vs. Close Price',
-            textStyle: {
-                fontWeight: 'bolder',
-                fontSize: '24',
-            },
-            textAlign: 'middle',
-            left: 'middle',
-            top: '5px'
-        },
+    lineAreaOption = {
+        color: "#499dd1",
         tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'cross',
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross'
+                },
             },
-        },
         xAxis: {
-            name: "Close Price",
-            nameLocation: "middle",
-            nameGap: "30",
-            nameTextStyle: {
-                fontWeight: "bolder",
-                fontSize: "18",
-            },
-            scale: true,
+            type: 'category',
+            boundaryGap: false,
+            data: lineCategory,
+            name: "Date",
+                    nameLocation: "middle",
+                    nameGap: "35",
+                    nameTextStyle: {
+                        fontWeight: "bolder",
+                        fontSize: "16",
+                    },
         },
         yAxis: {
-            name: "Volume",
+            scale: true,
+            type: 'value',
+            name: "Close Price",
             nameLocation: "middle",
-            nameGap: "65",
+            nameGap: "50",
             nameTextStyle: {
                 fontWeight: "bolder",
-                fontSize: "18",
+                fontSize: "16",
             },
-            scale: true,
+            axisLabel: {
+                formatter: function (value, index) {
+                    return '$ ' + value;
+                }
+            }
         },
         series: [
             {
-                type: 'scatter',
-                symbolSize: 20,
-                data: scatterData,
+                data: lineValue,
+                type: 'line',
+                areaStyle: {}
             }
         ]
     };
 
-    scatterChartOption && scatterChart.setOption(scatterChartOption);
+    lineAreaOption && lineAreaChart.setOption(lineAreaOption);
+
 
 </script>
 

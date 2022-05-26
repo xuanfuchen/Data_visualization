@@ -171,25 +171,34 @@ def companyDetail(request, symbol):
     categoryData = []
     valueData = []
     volumeData = []
-    scatterData = []
+    
+    lineCategory = []
+    lineValue = []
 
     for companyPrice in companyPriceHistory:
+        dateStr = companyPrice.price_date.strftime("%b %d")
+        
         # gather data for candlestick chart
-        categoryData.append(companyPrice.price_date.strftime("%b %d"))
+        categoryData.append(dateStr)
         valueList = [companyPrice.open, companyPrice.close, companyPrice.low, companyPrice.high]
         valueData.append(valueList)
         volumeData.append(companyPrice.volume)
 
-        # gather data for scatter chart
-        scatterList = [companyPrice.close, companyPrice.volume]
-        scatterData.append(scatterList)
+        # gather data for line chart
+        lineCategory.append(dateStr)
+        lineValue.append(companyPrice.close)
+
+
 
     dbData = {
         "companyDetail": companyDetail,
         "categoryData": categoryData,
         "valueData": valueData,
         "volumeData": volumeData,
-        "scatterData": scatterData
+        "lineCategory": lineCategory,
+        "lineValue": lineValue
+
+        
     }
 
     return render(request, 'contents/companyDetail.html', dbData)
