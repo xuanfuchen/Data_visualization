@@ -57,7 +57,7 @@ div {
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col" id="name_th">Company Name</th>
-                    <th scope="col">Symbol</th>
+                    <th scope="col">Stock Symbol</th>
                     <th scope="col">Country</th>
                     <th scope="col">Exchange</th>
                 </tr>
@@ -76,10 +76,42 @@ div {
                 {% endfor %}
             </tbody>
         </table>
-        <!-- {% for company in companies %}
-            <a href="{% url 'company_list' company.stock_symbol %}" class="list-group-item list-group-item-action list-group-item-secondary">{{company.company_name}}</a>
-        {% endfor %} -->
     </div>
+
+    <!-- page buttons -->
+    <div class="pagination row">
+        <div class="m-auto">
+            <span class="step-links">
+                <!-- if there's privious page, show the privious page button -->
+                {% if companies.has_previous %}
+                    <a href="?page=1" class="btn btn-primary">
+                        &laquo; 1
+                    </a>
+                    <span>...</span>
+                    <a href="?page={{ companies.previous_page_number }}" class = "btn btn-secondary">
+                        Prev
+                    </a>
+                {% endif %}
+
+                <!-- page button: current page -->
+                <span class="current btn btn-success btn-lg">
+                    {{ companies.number }}
+                </span>
+                
+                <!-- if there's next page, show next page button -->
+                {% if companies.has_next %}
+                    <a href="?page={{ companies.next_page_number }}" class="btn btn-secondary">
+                        Next
+                    </a>
+                    <span>...</span>
+                    <a href="?page={{ companies.paginator.num_pages }}" class="btn btn-primary">
+                        {{ companies.paginator.num_pages }} &raquo;
+                    </a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
 </div>
 <!--------------------------------------------------- page --------------------------------------------------->
 

@@ -6,6 +6,7 @@ from nasdaq_stock.models import CompanyInfo, PriceHistory
 from django.db.models import IntegerField
 from django.db.models.functions import Cast
 from datetime import datetime
+from django.core.paginator import Paginator
 
 # Create your views here.
 def main(request):
@@ -147,7 +148,12 @@ def macroMap(request):
 
 def companyList(request):
     # get all company info from model CompanyInfo
-    companies = CompanyInfo.objects.all()
+    companyList = CompanyInfo.objects.all()
+
+    paginator = Paginator(companyList, 100)
+    page = request.GET.get('page')
+
+    companies = paginator.get_page(page)
 
     dbData = { 
         "companies": companies,
