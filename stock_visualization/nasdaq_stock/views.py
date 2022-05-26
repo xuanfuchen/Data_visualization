@@ -7,6 +7,7 @@ from django.db.models import IntegerField
 from django.db.models.functions import Cast
 from datetime import datetime
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 # Create your views here.
 def main(request):
@@ -141,22 +142,33 @@ def macroMap(request):
         "country_count": country_count,
         "comp_count": comp_count,
         "country_sales": country_sales,
-        "comp_sales": comp_sales
+        "comp_sales": comp_sales,
     }
     return render(request, 'contents/maps.html', dbData)
 
 
 def companyList(request):
-    # get all company info from model CompanyInfo
-    companyList = CompanyInfo.objects.all()
+
+    search = request.GET.get('search')
+
+    if search:
+        companyList = CompanyInfo.objects.filter(Q(company_name__icontains = search) | Q(stock_symbol__icontains = search))
+    else:
+        # if there's no search, request.GET.get('search') will be "None", so we need to reset it to empty string
+        search = ''
+        companyList = CompanyInfo.objects.all()
 
     paginator = Paginator(companyList, 100)
     page = request.GET.get('page')
 
     companies = paginator.get_page(page)
 
+    count = companies.__len__
+
     dbData = { 
         "companies": companies,
+        "search": search,
+        "count": count
     }
 
     return render(request, 'contents/companyList.html', dbData)
