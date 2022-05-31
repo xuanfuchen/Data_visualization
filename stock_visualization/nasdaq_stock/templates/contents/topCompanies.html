@@ -60,6 +60,7 @@ Data Visualization
         <div class="col small_chart" id="top_ten_bar_country">
         </div>
     </div>
+    company_stock_change_percentage_list = {{company_stock_change_percentage_list|safe}}
 </div>
 
 <!--------------------------------------------------- large charts --------------------------------------------------->
@@ -357,18 +358,29 @@ Data Visualization
     var topTenStockChangeBarChart = echarts.init(topTenStockChangeDom, 'better_dark');
     var topTenStockChangeBarOption;
 
+    var company_stock_change_percentage_list = {{ company_stock_change_percentage_list | safe }}
+    var compName = {{ compName | safe }}
+
     const labelRight = {
         position: 'right'
     };
     topTenStockChangeBarOption = {
         title: {
-            text: 'Bar Chart with Negative Value'
+            text: 'Top 10 Companies\' Stock Performance',
+            subtext: 'profit from: Feb 15 to the highest of the rest of the prices',
+            textStyle: {
+                fontSize: "22"
+            },
+            subtextStyle: {
+                fontSize: 13
+            },
         },
         tooltip: {
             trigger: 'axis',
             axisPointer: {
                 type: 'shadow'
-            }
+            },
+            formatter: '{b} <br/> {c} %'
         },
         grid: {
             top: 80,
@@ -381,7 +393,13 @@ Data Visualization
                 lineStyle: {
                     type: 'dashed'
                 }
-            }
+            },
+            axisLabel: {
+                formatter: function (value, index) {
+                    var val = (value).toFixed(0) + '%'
+                    return val;
+                }
+            },
         },
         yAxis: {
             type: 'category',
@@ -389,40 +407,21 @@ Data Visualization
             axisLabel: { show: false },
             axisTick: { show: false },
             splitLine: { show: false },
-            data: [
-                'ten',
-                'nine',
-                'eight',
-                'seven',
-                'six',
-                'five',
-                'four',
-                'three',
-                'two',
-                'one'
-            ]
+            data: compName.reverse()
+
         },
         series: [
             {
-                name: 'Cost',
+                name: 'Profit',
                 type: 'bar',
                 stack: 'Total',
                 label: {
                     show: true,
-                    formatter: '{b}'
+                    formatter: '{b}',
+                    color: "rgba(255, 255, 255, 1)",
+                    fontWeight: "bold"
                 },
-                data: [
-                    { value: -0.07, label: labelRight },
-                    { value: -0.09, label: labelRight },
-                    0.2,
-                    0.44,
-                    { value: -0.23, label: labelRight },
-                    0.08,
-                    { value: -0.17, label: labelRight },
-                    0.47,
-                    { value: -0.36, label: labelRight },
-                    0.18
-                ]
+                data: company_stock_change_percentage_list.reverse()
             }
         ]
     };

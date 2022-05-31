@@ -1,6 +1,7 @@
 from asyncio.windows_events import NULL
 from collections import defaultdict
 from copy import deepcopy
+import profile
 from django.shortcuts import render
 from nasdaq_stock.models import CompanyInfo, PriceHistory
 from django.db.models import IntegerField
@@ -168,6 +169,25 @@ def topCompanies(request):
         industry_name.append(x[0])
         industry_count.append(x[1])
     
+    company_stock_change_percentage_list = []
+    for company in topCompanies:
+        company_history = PriceHistory.objects.filter(stock_symbol = company.stock_symbol).order_by('price_date')
+        start_price = float(company_history[0].close)
+        max_price = 0
+        for x in range(len(company_history)):
+            if x == 0:
+                pass
+            elif float(company_history[x].close) > max_price:
+                max_price = float(company_history[x].close)
+
+        change_percentage = (max_price - start_price) / start_price * 100.0
+        change_percentage = round(change_percentage, 2)
+        if change_percentage >= 0:
+            company_stock_change_percentage_list.append(change_percentage)
+        else:
+            company_stock_change_percentage_list.append({ 'value': change_percentage, 'label': 'labelRight' })
+
+    
     # ========================================================== get data for sales line chart ==========================================================
     # need a list [
     # ['dates', date, date, date ... ...]
@@ -229,7 +249,7 @@ def topCompanies(request):
         "industry_name": industry_name,
         "industry_count": industry_count,
 
-        
+        "company_stock_change_percentage_list": company_stock_change_percentage_list
 
     }
     return render(request, 'contents/topCompanies.html', dbData)
