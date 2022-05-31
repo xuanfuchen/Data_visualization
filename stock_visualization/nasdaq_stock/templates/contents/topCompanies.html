@@ -19,11 +19,14 @@ Data Visualization
     }
     .small_chart{
         height: 400px;
+        width: 25%;
     }
 
     .large{
         width: 45%;
     }
+
+
 
     div{
         /* border: solid; */
@@ -45,21 +48,16 @@ Data Visualization
     </div>
     
     <div class="row mt-3">
-        <div class="col">
-            <div class="small_chart" id="top_ten_bar_country">
-            </div>
+        <div class="col small_chart" id="top_ten_stock_price_change">
         </div>
-        <div class="col">
-            <div class="small_chart" id="top_ten_pie_sales">
-            </div>
+
+        <div class="col small_chart" id="top_ten_pie_sales">
         </div>
-        <div class="col">
-            <div class="small_chart" id="top_ten_bar_industry">
-            </div>
+
+        <div class="col small_chart" id="top_ten_bar_industry">
         </div>
-        <div class="col">
-            <div class="small_chart" id="top_ten_pie_industry">
-            </div>
+
+        <div class="col small_chart" id="top_ten_bar_country">
         </div>
     </div>
 </div>
@@ -238,7 +236,7 @@ Data Visualization
             data: [""]
         },
         grid: {
-          left: '20%',
+            left: '20%',
         },
         xAxis: {
             type: 'value',
@@ -270,13 +268,13 @@ Data Visualization
 
     topTenSalesPieOption = {
         title: {
-            text: 'Top 10 Companies by Sales',
+            text: 'Top 10 Companies Sales Ratio',
             textStyle: {
                 fontSize: "24"
             },
             left: 'center',
         },
-        color:['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#ee6666'],
+        color: ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#ee6666'],
         tooltip: {
             trigger: 'item',
             formatter: '{b} : $ {c} <br/>({d}%)'
@@ -304,17 +302,17 @@ Data Visualization
     topTenSalesPieChart && topTenSalesPieChart.setOption(topTenSalesPieOption);
 
     //--------------------------------------------------- top_ten_bar_industry ---------------------------------------------------
-    var topTenBarCountryDom = document.getElementById('top_ten_bar_country');
-    var topTenBarCountry = echarts.init(topTenBarCountryDom, 'better_dark');
+    var topTenBarIndustryDom = document.getElementById('top_ten_bar_industry');
+    var topTenBarIndustry = echarts.init(topTenBarIndustryDom, 'better_dark');
 
     // get data from the backend
-    var country_name = {{ country_name | safe }};
-    var country_count = {{ country_count | safe }};
+    var industry_name = {{ industry_name | safe }};
+    var industry_count = {{ industry_count | safe }};
 
     // set options fo the chart
-    var topTenBarCountryOption = {
+    var topTenBarIndustryOption = {
         title: {
-            text: "Company Geographical Distribution",
+            text: "Company Industrial Distribution",
             textStyle: {
                 fontSize: "24"
             }
@@ -330,28 +328,106 @@ Data Visualization
             data: [""]
         },
         grid: {
-          left: '20%',
+            left: '23%',
         },
         xAxis: {
             type: 'value',
             boundaryGap: [0, 0.01]
         },
         yAxis: {
-            data: country_name.reverse(),
+            data: industry_name.reverse(),
             type: "category",
             axisLabel: {
                 fontSize: 12,
+                rotate: 30,
             }
         },
         series: [
             {
                 name: "Company Number",
                 type: 'bar',
-                data: country_count.reverse(),
+                data: industry_count.reverse(),
             },
         ]
     };
-    topTenBarCountry.setOption(topTenBarCountryOption);
+    topTenBarIndustry.setOption(topTenBarIndustryOption);
+
+//--------------------------------------------------- top_ten_stock_price_change ---------------------------------------------------
+    var topTenStockChangeDom = document.getElementById('top_ten_stock_price_change');
+    var topTenStockChangeBarChart = echarts.init(topTenStockChangeDom, 'better_dark');
+    var topTenStockChangeBarOption;
+
+    const labelRight = {
+        position: 'right'
+    };
+    topTenStockChangeBarOption = {
+        title: {
+            text: 'Bar Chart with Negative Value'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            }
+        },
+        grid: {
+            top: 80,
+            bottom: 30
+        },
+        xAxis: {
+            type: 'value',
+            position: 'top',
+            splitLine: {
+                lineStyle: {
+                    type: 'dashed'
+                }
+            }
+        },
+        yAxis: {
+            type: 'category',
+            axisLine: { show: false },
+            axisLabel: { show: false },
+            axisTick: { show: false },
+            splitLine: { show: false },
+            data: [
+                'ten',
+                'nine',
+                'eight',
+                'seven',
+                'six',
+                'five',
+                'four',
+                'three',
+                'two',
+                'one'
+            ]
+        },
+        series: [
+            {
+                name: 'Cost',
+                type: 'bar',
+                stack: 'Total',
+                label: {
+                    show: true,
+                    formatter: '{b}'
+                },
+                data: [
+                    { value: -0.07, label: labelRight },
+                    { value: -0.09, label: labelRight },
+                    0.2,
+                    0.44,
+                    { value: -0.23, label: labelRight },
+                    0.08,
+                    { value: -0.17, label: labelRight },
+                    0.47,
+                    { value: -0.36, label: labelRight },
+                    0.18
+                ]
+            }
+        ]
+    };
+
+    topTenStockChangeBarOption && topTenStockChangeBarChart.setOption(topTenStockChangeBarOption);
 </script>
 
 {% endblock content %}

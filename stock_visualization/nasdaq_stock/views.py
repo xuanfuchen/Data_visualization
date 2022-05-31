@@ -142,16 +142,16 @@ def topCompanies(request):
     symbolList = []
     salesList = []
     employees = []
-    industry = []
     country_dict = defaultdict(int)
+    industry_dict = defaultdict(int)
     top_ten_sales_pie_data = [] #[{value: sales, name: company}, {value: sales, name: company} ...]
     for company in topCompanies:
         compNameList.append(company.company_name)
         symbolList.append(company.stock_symbol)
         salesList.append(company.sales)
         employees.append(company.employees)
-        industry.append(company.industry)
         country_dict[company.country] += 1
+        industry_dict[company.industry] += 1
         top_ten_sales_pie_data.append({'value': company.sales, 'name': company.company_name})
     
     country_dict = sorted(country_dict.items(), key = lambda x: x[1], reverse=True)
@@ -160,6 +160,13 @@ def topCompanies(request):
     for x in country_dict:
         country_name.append(x[0])
         country_count.append(x[1])
+    
+    industry_dict = sorted(industry_dict.items(), key = lambda x: x[1], reverse=True)
+    industry_name = []
+    industry_count = []
+    for x in industry_dict:
+        industry_name.append(x[0])
+        industry_count.append(x[1])
     
     # ========================================================== get data for sales line chart ==========================================================
     # need a list [
@@ -218,6 +225,11 @@ def topCompanies(request):
         "country_name": country_name,
         "country_count": country_count,
         "top_ten_sales_pie_data": top_ten_sales_pie_data,
+
+        "industry_name": industry_name,
+        "industry_count": industry_count,
+
+        
 
     }
     return render(request, 'contents/topCompanies.html', dbData)
