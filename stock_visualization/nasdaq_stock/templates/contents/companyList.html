@@ -116,7 +116,7 @@ body {
                 </a>
                 <span>...</span>
                 <a href="?page={{ companies.previous_page_number }}&search={{ search }}" class="btn btn-secondary">
-                    Prev
+                    &#8592; Prev
                 </a>
                 {% endif %}
 
@@ -128,7 +128,7 @@ body {
                 <!-- if there's next page, show next page button -->
                 {% if companies.has_next %}
                 <a href="?page={{ companies.next_page_number }}&search={{ search }}" class="btn btn-secondary">
-                    Next
+                    Next &#8594;
                 </a>
                 <span>...</span>
                 <a href="?page={{ companies.paginator.num_pages }}&search={{ search }}" class="btn btn-primary">

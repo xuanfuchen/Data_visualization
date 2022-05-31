@@ -34,10 +34,6 @@ Data Visualization
     .side_column{
         padding: 5px;
     }
-
-    div {
-        /* border: solid */
-    }
 </style>
 
 <!--------------------------------------------------- page --------------------------------------------------->
@@ -46,11 +42,13 @@ Data Visualization
         <!-- first column -->
         <div class="column_1 col-3 mt-3">
             <div class="side_column rounded bg-light">
-                <div class="chart mt-2" id="sector_sales_pie">
-
+                <div class="chart mt-2" id="sector_sales_bar">
                 </div>
-                <div class="chart mt-2" id="sector_employees_pie">
-    
+                <hr>
+                <div class="chart mt-2" id="sector_employees_bar">
+                </div>
+                <hr>
+                <div class="chart mt-2" id="sector_number_bar">
                 </div>
             </div>
         </div>
@@ -90,9 +88,13 @@ Data Visualization
         <!-- third colunm -->
         <div class="column_3 col-3 mt-3">
             <div class="side_column rounded bg-light">
-                <div class="chart mt-2 ml-auto" id="sector_sales_bar">
+                <div class="chart mt-2 ml-auto" id="sector_sales_pie">
                 </div>
-                <div class="chart mt-2 ml-auto" id="sector_employees_bar">
+                <hr>
+                <div class="chart mt-2 ml-auto" id="sector_employees_pie">
+                </div>
+                <hr>
+                <div class="chart mt-2 ml-auto" id="sector_number_pie">
                 </div>
             </div>
         </div>
@@ -103,19 +105,19 @@ Data Visualization
 
 <!--------------------------------------------------- charts --------------------------------------------------->
 
-<!----------------------------------------------- sector bar chart -------------------------------------------->
+<!----------------------------------------------- sector sales bar chart -------------------------------------------->
 <script type="text/javascript">
     var barChartDom = document.getElementById('sector_sales_bar');
-    var topBarChart = echarts.init(barChartDom, 'better_dark');
+    var topBarChart = echarts.init(barChartDom);
 
     // get data from the backend
-    var top_sector_name_list = {{ top_sector_name_list | safe }};
-    var top_sector_sales_list = {{ top_sector_sales_list | safe }};
+    var top_sales_sector_name_list = {{ top_sales_sector_name_list | safe }};
+    var top_sales_sector_value_list = {{ top_sales_sector_value_list | safe }};
 
     // set options fo the chart
     var barChartOption = {
         title: {
-            text: "Top 10 Sectors by Sales",
+            text: "Top 10 Sectors by Total Sales",
             textStyle: {
                 fontSize: "24"
             },
@@ -144,38 +146,40 @@ Data Visualization
                     var val = Math.abs(value)
                     var oneBillion = 1000000000;
                     if (val >= oneBillion) {
-                        val = '$ ' + (val / oneBillion).toFixed(0) + 'B'
+                        val = '$ ' + (val / oneBillion).toFixed(0) + ' B'
                     }
                     return val;
                 },
+                fontSize: 14
             },
             boundaryGap: [0, 0.01]
         },
         xAxis: {
             containLabel: true,
-            data: top_sector_name_list,
+            data: top_sales_sector_name_list,
             type: "category",
             axisLabel: {
                 rotate: 35,
                 showMaxLabel: true,
+                fontSize: 14
             }
         },
         series: [
             {
                 name: "sales",
                 type: 'bar',
-                data: top_sector_sales_list
+                data: top_sales_sector_value_list
             },
         ]
     };
     topBarChart.setOption(barChartOption);
 
-    // <!------------------------------------------------ sector pie chart --------------------------------------------->
+    // <!------------------------------------------------ sector sales pie chart --------------------------------------------->
     var sectorPieChartDom = document.getElementById('sector_sales_pie');
-    var sectorPieChart = echarts.init(sectorPieChartDom, 'better_dark');
+    var sectorPieChart = echarts.init(sectorPieChartDom);
     var sectorPieOption;
 
-    var sector_total_list = {{ sector_total_list | safe }}
+    var sector_sales_total_list = {{ sector_sales_total_list | safe }}
 
     sectorPieOption = {
         title: {
@@ -185,6 +189,7 @@ Data Visualization
             },
             left: 'center',
         },
+        color:['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#ee6666'],
         tooltip: {
             trigger: 'item',
             formatter: '{b} : $ {c} <br/>({d}%)'
@@ -193,14 +198,22 @@ Data Visualization
             {
                 name: 'Access From',
                 type: 'pie',
-                radius: '50%',
-                data: sector_total_list,
+                radius: ['30%', '50%'],
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                data: sector_sales_total_list,
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
                         shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        shadowColor: 'rgba(0, 0, 0, 0.5)',
                     }
+                },
+                label: {
+                    fontSize: 15
                 }
             }
         ]
@@ -385,6 +398,227 @@ $.get("{% static 'json/world.json' %}", function (worldJson) {
 });
 
 salesMapOption && salesMap.setOption(salesMapOption);
+
+// <!----------------------------------------------- sector employees bar chart -------------------------------------------->
+    var employeesBarChartDom = document.getElementById('sector_employees_bar');
+    var employeesBarChart = echarts.init(employeesBarChartDom);
+
+    // get data from the backend
+    var top_employees_sector_name_list = {{ top_employees_sector_name_list | safe }};
+    var top_employees_sector_value_list = {{ top_employees_sector_value_list | safe }};
+
+    // set options fo the chart
+    var employeesBarOption = {
+        title: {
+            text: "Top 10 Sectors by Total Employees",
+            textStyle: {
+                fontSize: "24"
+            },
+            left: 'center',
+        },
+        tooltip: {
+            show: true,
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            },
+        },
+        legend: {
+            data: [""]
+        },
+        grid: [
+        {
+          left: '15%',
+          bottom: '30%'
+        }
+        ],
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: function (value, index) {
+                    var val = Math.abs(value)
+                    var oneBillion = 1000;
+                    if (val >= oneBillion) {
+                        val = '$ ' + (val / oneBillion).toFixed(0) + 'k'
+                    }
+                    return val;
+                },
+            },
+            boundaryGap: [0, 0.01]
+        },
+        xAxis: {
+            containLabel: true,
+            data: top_employees_sector_name_list,
+            type: "category",
+            axisLabel: {
+                rotate: 35,
+                showMaxLabel: true,
+                fontSize: 14
+            }
+        },
+        series: [
+            {
+                name: "employees",
+                type: 'bar',
+                data: top_employees_sector_value_list
+            },
+        ]
+    };
+    employeesBarChart.setOption(employeesBarOption);
+
+    // <!------------------------------------------------ sector sales pie chart --------------------------------------------->
+    var employeesPieChartDom = document.getElementById('sector_employees_pie');
+    var employeesPieChart = echarts.init(employeesPieChartDom);
+    var employeesPieOption;
+
+    var sector_employees_total_list = {{ sector_employees_total_list | safe }}
+
+    employeesPieOption = {
+        title: {
+            text: 'Top 10 Sectors by Total Employees',
+            textStyle: {
+                fontSize: "24"
+            },
+            left: 'center',
+        },
+        color:['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#ee6666'],
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b} : {c} People <br/>({d}%)'
+        },
+        series: [
+            {
+                name: 'Access From',
+                type: 'pie',
+                radius: ['30%', '50%'],
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                data: sector_employees_total_list,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                label: {
+                    fontSize: 15
+                }
+            }
+        ]
+    };
+
+    employeesPieChart && employeesPieChart.setOption(employeesPieOption);
+
+
+// <!----------------------------------------------- sector number bar chart -------------------------------------------->
+    var numberBarChartDom = document.getElementById('sector_number_bar');
+    var numberBarChart = echarts.init(numberBarChartDom);
+
+    // get data from the backend
+    var top_number_sector_name_list = {{ top_number_sector_name_list | safe }};
+    var top_number_sector_value_list = {{ top_number_sector_value_list | safe }};
+
+    // set options fo the chart
+    var numberBarOption = {
+        title: {
+            text: "Top 10 Sectors by Numbers",
+            textStyle: {
+                fontSize: "24"
+            },
+            left: 'center',
+        },
+        tooltip: {
+            show: true,
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            },
+        },
+        legend: {
+            data: [""]
+        },
+        grid: [
+        {
+          left: '15%',
+          bottom: '30%'
+        }
+        ],
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+            },
+            boundaryGap: [0, 0.01]
+        },
+        xAxis: {
+            containLabel: true,
+            data: top_number_sector_name_list,
+            type: "category",
+            axisLabel: {
+                rotate: 35,
+                showMaxLabel: true,
+                fontSize: 14
+            }
+        },
+        series: [
+            {
+                name: "employees",
+                type: 'bar',
+                data: top_number_sector_value_list
+            },
+        ]
+    };
+    numberBarChart.setOption(numberBarOption);
+
+    // <!------------------------------------------------ sector number pie chart --------------------------------------------->
+    var numberPieChartDom = document.getElementById('sector_number_pie');
+    var numberPieChart = echarts.init(numberPieChartDom);
+    var numberPieOption;
+
+    var sector_bumber_total_list = {{ sector_bumber_total_list | safe }}
+
+    numberPieOption = {
+        title: {
+            text: 'Top 10 Sectors by Numbers',
+            textStyle: {
+                fontSize: "24"
+            },
+            left: 'center',
+        },
+        color:['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#ee6666'],
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b} : {c} People <br/>({d}%)'
+        },
+        series: [
+            {
+                name: 'Access From',
+                type: 'pie',
+                radius: ['30%', '50%'],
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                data: sector_bumber_total_list,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                label: {
+                    fontSize: 15
+                }
+            }
+        ]
+    };
+
+    numberPieChart && numberPieChart.setOption(numberPieOption);
 
 </script>
 

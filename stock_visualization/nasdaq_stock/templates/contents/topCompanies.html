@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load static %}
+<!-- title defined in base.html -->
+{% block title %}
+Data Visualization
+{% endblock title %}
+
+<!-- contents -->
+{% block content %}
+
+
+<!-- css for the page (sometimes runserver is not response to the updates in static file for some reason) -->
+<style>
+    body {
+        background-color: #808080;
+    }
+    .chart{
+        height: 400px;
+    }
+    .small_chart{
+        height: 400px;
+    }
+
+    .large{
+        width: 45%;
+    }
+
+    div{
+        /* border: solid; */
+    }
+</style>
+
+<!--------------------------------------------------- page --------------------------------------------------->
+
+<div class="container-fluid">
+    <div class="row mt-3">
+        <div class="col large">
+            <div class="chart" id="top_ten_bar">
+            </div>
+        </div>
+        <div class="col large">
+            <div class="chart" id="top_ten_line">
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-3">
+        <div class="col">
+            <div class="small_chart" id="top_ten_bar_country">
+            </div>
+        </div>
+        <div class="col">
+            <div class="small_chart" id="top_ten_pie_sales">
+            </div>
+        </div>
+        <div class="col">
+            <div class="small_chart" id="top_ten_bar_industry">
+            </div>
+        </div>
+        <div class="col">
+            <div class="small_chart" id="top_ten_pie_industry">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--------------------------------------------------- large charts --------------------------------------------------->
+<script>
+// <!----------------------------------------------- top ten bar chart -------------------------------------------->
+    var barChartDom = document.getElementById('top_ten_bar');
+    var topBarChart = echarts.init(barChartDom, 'better_dark');
+
+    // get data from the backend
+    var comp_symbol = {{ comp_symbol | safe }};
+    var sales = {{ sales | safe }};
+
+    // resize not working for some reason
+    window.onresize = function () {
+        topBarChart.resize();
+    };
+
+    // set options fo the chart
+    var barChartOption = {
+        title: {
+            text: "Top 10 Companies by Sales in 2021",
+            textStyle: {
+                fontSize: "24"
+            }
+        },
+        tooltip: {
+            show: true,
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            },
+        },
+        legend: {
+            data: [""]
+        },
+        grid: {
+        },
+        xAxis: {
+            type: 'value',
+
+            axisLabel: {
+                formatter: function (value, index) {
+                    var val = Math.abs(value)
+                    var oneBillion = 1000000000;
+                    if (val >= oneBillion) {
+                        val = '$ ' + (val / oneBillion).toFixed(0) + ' B'
+                    }
+                    return val;
+                }
+            },
+            boundaryGap: [0, 0.01]
+        },
+        yAxis: {
+            containLabel: true,
+            data: comp_symbol.reverse(),
+            type: "category",
+            axisLabel: {
+            }
+        },
+        series: [
+            {
+                name: "sales",
+                type: 'bar',
+                data: sales.reverse()
+            },
+        ]
+    };
+    topBarChart.setOption(barChartOption);
+
+    // ----------------------------------------------- top ten line chart --------------------------------------------
+    var lineChartDom = document.getElementById('top_ten_line');
+    var topLineChart = echarts.init(lineChartDom, 'better_dark');
+    var topLineOption;
+
+    var salesLineChartData = {{ salesLineChartData | safe}}
+
+    setTimeout(function () {
+        topLineOption = {
+            title: {
+                text: "Top 10 Companies Stock Price",
+                textStyle: {
+                    fontSize: "24"
+                }
+            },
+            legend: {
+                bottom: "bottom"
+            },
+            tooltip: {
+                trigger: 'axis',
+                showContent: true
+            },
+            dataset: {
+                source: salesLineChartData
+            },
+            xAxis: { type: 'category' },
+            yAxis: {
+                gridIndex: 0,
+                scale: true
+            },
+            series: [
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+                {
+                    type: 'line',
+                    seriesLayoutBy: 'row'
+                },
+            ]
+        };
+        topLineChart.setOption(topLineOption);
+    });
+
+    topLineOption && topLineChart.setOption(topLineOption);
+</script>
+
+<!--------------------------------------------------- small charts --------------------------------------------------->
+<script>
+    var topTenBarCountryDom = document.getElementById('top_ten_bar_country');
+    var topTenBarCountry = echarts.init(topTenBarCountryDom, 'better_dark');
+
+    // get data from the backend
+    var country_name = {{ country_name | safe }};
+    var country_count = {{ country_count | safe }};
+
+    // set options fo the chart
+    var topTenBarCountryOption = {
+        title: {
+            text: "Company Geographical Distribution",
+            textStyle: {
+                fontSize: "24"
+            }
+        },
+        tooltip: {
+            show: true,
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            },
+        },
+        legend: {
+            data: [""]
+        },
+        grid: {
+          left: '20%',
+        },
+        xAxis: {
+            type: 'value',
+            boundaryGap: [0, 0.01]
+        },
+        yAxis: {
+            data: country_name.reverse(),
+            type: "category",
+            axisLabel: {
+                fontSize: 12,
+            }
+        },
+        series: [
+            {
+                name: "Company Number",
+                type: 'bar',
+                data: country_count.reverse(),
+            },
+        ]
+    };
+    topTenBarCountry.setOption(topTenBarCountryOption);
+
+    //--------------------------------------------------- top_ten_pie_sales ---------------------------------------------------
+    var topTenSalesPieChartDom = document.getElementById('top_ten_pie_sales');
+    var topTenSalesPieChart = echarts.init(topTenSalesPieChartDom, 'better_dark');
+    var topTenSalesPieOption;
+
+    var top_ten_sales_pie_data = {{ top_ten_sales_pie_data | safe }}
+
+    topTenSalesPieOption = {
+        title: {
+            text: 'Top 10 Companies by Sales',
+            textStyle: {
+                fontSize: "24"
+            },
+            left: 'center',
+        },
+        color:['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#ee6666'],
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b} : $ {c} <br/>({d}%)'
+        },
+        series: [
+            {
+                name: 'Access From',
+                type: 'pie',
+                radius: ['30%', '50%'],
+                data: top_ten_sales_pie_data,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                label: {
+                    fontSize: 15
+                }
+            }
+        ]
+    };
+
+    topTenSalesPieChart && topTenSalesPieChart.setOption(topTenSalesPieOption);
+
+    //--------------------------------------------------- top_ten_bar_industry ---------------------------------------------------
+    var topTenBarCountryDom = document.getElementById('top_ten_bar_country');
+    var topTenBarCountry = echarts.init(topTenBarCountryDom, 'better_dark');
+
+    // get data from the backend
+    var country_name = {{ country_name | safe }};
+    var country_count = {{ country_count | safe }};
+
+    // set options fo the chart
+    var topTenBarCountryOption = {
+        title: {
+            text: "Company Geographical Distribution",
+            textStyle: {
+                fontSize: "24"
+            }
+        },
+        tooltip: {
+            show: true,
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            },
+        },
+        legend: {
+            data: [""]
+        },
+        grid: {
+          left: '20%',
+        },
+        xAxis: {
+            type: 'value',
+            boundaryGap: [0, 0.01]
+        },
+        yAxis: {
+            data: country_name.reverse(),
+            type: "category",
+            axisLabel: {
+                fontSize: 12,
+            }
+        },
+        series: [
+            {
+                name: "Company Number",
+                type: 'bar',
+                data: country_count.reverse(),
+            },
+        ]
+    };
+    topTenBarCountry.setOption(topTenBarCountryOption);
+</script>
+
+{% endblock content %}
